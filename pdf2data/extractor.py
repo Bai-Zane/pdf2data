@@ -1,4 +1,4 @@
-"""Core waveform extraction logic."""
+"""波形提取核心逻辑实现。"""
 
 from __future__ import annotations
 
@@ -26,14 +26,14 @@ from .config import DEFAULT_CONFIG, Region, WaveformConfig
 
 @dataclass
 class WaveformResult:
-    """Result for a single waveform."""
+    """单条波形的提取结果。"""
 
     region: Region
     points: np.ndarray  # shape (N, 2)
     mask: Image.Image
 
     def to_normalised(self) -> np.ndarray:
-        """Return the points normalised to [0, 1] range within the region."""
+        """将波形坐标归一化至区域内的 [0, 1] 范围。"""
 
         width = self.region.width()
         height = self.region.height()
@@ -46,7 +46,7 @@ class WaveformResult:
 
 
 class WaveformExtractor:
-    """Extract waveform traces from PDF documents."""
+    """从 PDF 文档中提取心电波形轨迹。"""
 
     def __init__(self, config: WaveformConfig = DEFAULT_CONFIG) -> None:
         config.validate()
@@ -57,11 +57,14 @@ class WaveformExtractor:
         return self.from_image(image)
 
     def from_image(self, image: Image.Image) -> List[WaveformResult]:
+        # 将输入图像缩放至固定页面尺寸，确保坐标系统一致
         resized = image.resize(self.config.page_size, Image.Resampling.LANCZOS)
         results: List[WaveformResult] = []
         for region in self.config.waveforms:
             crop = region.crop(resized)
+            # 通过形态学操作去除网格线，仅保留波形
             mask = self._isolate_waveform(crop)
+            # 对每一列取中值位置，得到波形轨迹点
             points = self._sample_points(mask)
             results.append(WaveformResult(region=region, points=points, mask=mask))
         return results
@@ -79,7 +82,7 @@ class WaveformExtractor:
 
     @staticmethod
     def _isolate_waveform(image: Image.Image) -> Image.Image:
-        """Remove grid lines and annotations to obtain a binary waveform mask."""
+        """移除背景网格与标注，得到二值化的波形掩模。"""
 
         np_img = np.array(image.convert("RGB"))
         gray = cv2.cvtColor(np_img, cv2.COLOR_RGB2GRAY)
@@ -104,6 +107,8 @@ class WaveformExtractor:
 
     @staticmethod
     def _sample_points(mask: Image.Image) -> np.ndarray:
+        """沿列方向采样波形掩模，生成像素坐标序列。"""
+
         np_mask = np.array(mask)
         height, width = np_mask.shape
         columns: List[Tuple[int, int]] = []

@@ -1,4 +1,4 @@
-"""Configuration objects that describe the layout of the waveform canvas."""
+"""描述心电图波形画布布局的配置对象。"""
 
 from __future__ import annotations
 
@@ -55,11 +55,15 @@ class WaveformConfig:
                 raise ValueError(f"Waveform region {region} must be inside the canvas")
 
     def _within(self, region: Region) -> bool:
+        """判断区域是否完全处于页面边界之内。"""
+
         width, height = self.page_size
         return 0 <= region.left < region.right <= width and 0 <= region.top < region.bottom <= height
 
     @staticmethod
     def _contained(inner: Region, outer: Region) -> bool:
+        """判断内层区域是否被外层区域完整包含。"""
+
         return (
             outer.left <= inner.left <= inner.right <= outer.right
             and outer.top <= inner.top <= inner.bottom <= outer.bottom

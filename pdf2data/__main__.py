@@ -1,4 +1,4 @@
-"""Command line entry point for the waveform extractor."""
+"""波形提取器的命令行入口。"""
 
 from __future__ import annotations
 
@@ -14,17 +14,17 @@ from .extractor import WaveformExtractor
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Extract waveform data from PDF reports")
+    parser = argparse.ArgumentParser(description="从 PDF 报告中提取波形数据")
     subparsers = parser.add_subparsers(dest="command")
 
-    extract = subparsers.add_parser("extract", help="Extract waveform data")
-    extract.add_argument("pdf", type=Path, help="Path to the input PDF file")
-    extract.add_argument("output", type=Path, help="Directory for extracted data")
-    extract.add_argument("--page", type=int, default=0, help="Zero-based page index")
+    extract = subparsers.add_parser("extract", help="提取波形数据")
+    extract.add_argument("pdf", type=Path, help="输入 PDF 文件路径")
+    extract.add_argument("output", type=Path, help="输出数据的目录")
+    extract.add_argument("--page", type=int, default=0, help="从零开始的页码索引")
     extract.add_argument(
         "--save-debug",
         action="store_true",
-        help="Save waveform mask images for inspection",
+        help="保存波形掩模图像以供检查",
     )
 
     return parser
@@ -44,7 +44,7 @@ def main(argv: List[str] | None = None) -> None:
     extractor = WaveformExtractor(DEFAULT_CONFIG)
     results = extractor.from_pdf(args.pdf, page=args.page)
 
-    # Save the cropped canvas for reference
+    # 保存裁剪后的画布，方便后续复核
     rendered = extractor._render_pdf(args.pdf, page=args.page)
     cropped = DEFAULT_CONFIG.canvas.crop(rendered.resize(DEFAULT_CONFIG.page_size, Image.Resampling.LANCZOS))
     cropped.save(output_dir / "crop.png")
