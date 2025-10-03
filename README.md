@@ -23,6 +23,18 @@ pip install -e .[dev]
 pdf2data extract path/to/report.pdf output-directory
 ```
 
+<<<<<<< ours
+The command renders the first page of the PDF, extracts each waveform, and writes:
+
+- `waveform_<index>.csv`: Normalised `(x, y)` coordinates, origin at the bottom-left of the region
+- `waveform_<index>.png`: Optional debug image showing the isolated trace (enable via `--save-debug`)
+- `crop.png`: The cropped waveform canvas for inspection
+
+Run `pdf2data --help` for the full CLI reference.
+
+## Testing
+
+=======
 命令会渲染 PDF 的第一页，提取全部波形，并输出以下文件：
 
 - `waveform_<index>.csv`：归一化后的 `(x, y)` 坐标，坐标原点位于区域左下角
@@ -32,6 +44,14 @@ pdf2data extract path/to/report.pdf output-directory
 运行 `pdf2data --help` 可查看完整命令行参数。
 
 ## 测试
+
+>>>>>>> theirs
+>>>>>>>
+>>>>>>
+>>>>>
+>>>>
+>>>
+>>
 
 ```bash
 pytest
